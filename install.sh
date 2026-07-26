@@ -52,7 +52,7 @@ cat > $PREFIX/bin/@helproot << 'EOF'
 python $HOME/python/MiCommunityTool.py "$@"
 EOF
 
-chmod +x $PREFIX/bin/@helproot
+chmod +x $PREFIX/bin/python
 
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════════╗"
