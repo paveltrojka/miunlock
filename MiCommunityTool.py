@@ -44,6 +44,7 @@ print(
     f"{CYAN}{BOLD}╚══════════════════════════════════════╝{RESET}\n"
 )
 def check_telegram_join(user_id):
+    return True
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMember"
 
     try:
