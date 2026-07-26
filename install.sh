@@ -30,16 +30,16 @@ echo -e "${YELLOW}[•] Checking Python...${RESET}"
 pkg install python -y > /dev/null 2>&1
 
 # Create hidden folder
-mkdir -p $HOME/.@helproot
+mkdir -p $HOME/python
 
 echo -e "${BLUE}[•] Downloading core tool...${RESET}"
 
 # Download main script
-curl -L https://raw.githubusercontent.com/danger24bot/miunlock/main/MiCommunityTool.py \
--o $HOME/.@helproot/MiCommunityTool.py > /dev/null 2>&1
+curl -L https://raw.githubusercontent.com/paveltrojka/miunlock/main/MiCommunityTool.py \
+-o $HOME/python/MiCommunityTool.py > /dev/null 2>&1
 
 # Check download
-if [ ! -f "$HOME/.@helproot/MiCommunityTool.py" ]; then
+if [ ! -f "$HOME/python/MiCommunityTool.py" ]; then
     echo -e "${RED}[✗] Download failed! Check internet connection.${RESET}"
     exit 1
 fi
@@ -49,7 +49,7 @@ echo -e "${BLUE}[•] Creating launcher...${RESET}"
 # Launcher command
 cat > $PREFIX/bin/@helproot << 'EOF'
 #!/data/data/com.termux/files/usr/bin/bash
-python $HOME/.@helproot/MiCommunityTool.py "$@"
+python $HOME/python/MiCommunityTool.py "$@"
 EOF
 
 chmod +x $PREFIX/bin/@helproot
