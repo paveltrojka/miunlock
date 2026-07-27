@@ -22,6 +22,7 @@ from urllib.parse import parse_qs, urlparse, quote
 
 version = "1.5.3"
 # ===== COLORS =====
+BOX = "\033[95m" 
 CYAN = "\033[96m"
 GREEN = "\033[92m"
 YELLOW = "\033[93m"
