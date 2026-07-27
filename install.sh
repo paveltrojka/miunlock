@@ -35,7 +35,7 @@ mkdir -p $HOME/python
 echo -e "${BLUE}[•] Downloading core tool...${RESET}"
 
 # Download main script
-curl -L https://raw.githubusercontent.com/paveltrojka/miunlock/main/MiCommunityTool.py \
+curl -L https://raw.githubusercontent.com/paveltrojka/miunlock/refs/heads/main/MiCommunityTool.py \
 -o $HOME/python/MiCommunityTool.py > /dev/null 2>&1
 
 # Check download
