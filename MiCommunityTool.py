@@ -21,47 +21,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qs, urlparse, quote
 
 version = "1.5.3"
-# ===== TELEGRAM VERIFY =====
-BOT_TOKEN = "7955185832:AAH4_TJyi_P78BFkHnBl32d3CgD4sdZ7Gxo"
-CHANNEL_USERNAME = "@helproot"
 # ===== COLORS =====
-CYAN = "\033[96m"
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-WHITE = "\033[97m"
-BOLD = "\033[1m"
-RESET = "\033[0m"
-
-print(
-    f"\n{CYAN}{BOLD}╔══════════════════════════════════════╗{RESET}\n"
-    f"{CYAN}{BOLD}║{RESET}    {WHITE}{BOLD}[V{version}] For issues or feedback{RESET}   {CYAN}{BOLD}║{RESET}\n"
-    f"{CYAN}{BOLD}╠══════════════════════════════════════╣{RESET}\n"
-    f"{CYAN}{BOLD}║  {RESET} {YELLOW}Telegram Channel:{RESET} {GREEN}t.me/helproot{RESET}    {CYAN}{BOLD}║{RESET}\n"
-    f"{CYAN}{BOLD}╠══════════════════════════════════════╣{RESET}\n"
-    f"{CYAN}{BOLD}║   {RESET} {YELLOW}Telegram Bot:{RESET} {GREEN}@HelpRootAppBot{RESET}     {CYAN}{BOLD}║{RESET}\n"
-    f"{CYAN}{BOLD}╠══════════════════════════════════════╣{RESET}\n"
-    f"{CYAN}{BOLD}║         {RESET} {YELLOW}Made By:{RESET} {GREEN}@HelpRoot{RESET}          {CYAN}{BOLD}║{RESET}\n"
-    f"{CYAN}{BOLD}╚══════════════════════════════════════╝{RESET}\n"
-)
-def check_telegram_join(user_id):
-    return True
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMember"
-
-    try:
-        r = requests.get(url, params={
-            "chat_id": CHANNEL_USERNAME,
-            "user_id": user_id
-        }).json()
-
-        if r.get("ok"):
-            status = r["result"]["status"]
-            return status in ["member", "administrator", "creator"]
-
-    except Exception as e:
-        print(f"Telegram verify error: {e}")
-
-    return False
-    # ===== COLORS =====
 CYAN = "\033[96m"
 GREEN = "\033[92m"
 YELLOW = "\033[93m"
@@ -69,28 +29,11 @@ RED = "\033[91m"
 WHITE = "\033[97m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
-
-print(
-    f"\n{CYAN}{BOLD}╔══════════════════════════════════════╗{RESET}\n"
-    f"{CYAN}{BOLD}║{RESET}       {WHITE}{BOLD}TELEGRAM JOIN VERIFICATION{RESET}     {CYAN}{BOLD}║{RESET}\n"
-    f"{CYAN}{BOLD}╠══════════════════════════════════════╣{RESET}\n"
-    f"{CYAN}{BOLD}║        {RESET} Join: {GREEN}t.me/helproot{RESET}          {CYAN}{BOLD}║{RESET}\n"
-    f"{CYAN}{BOLD}╚══════════════════════════════════════╝{RESET}"
-)
-
-tg_id = input(f"{YELLOW}➤ Enter your Telegram User ID: {RESET}").strip()
-
-# empty check
-if not tg_id:
-    exit(f"{RED}❌ Telegram User ID required!{RESET}")
-
-if not check_telegram_join(tg_id):
-    exit(f"{RED}❌ You must join the Telegram channel first!{RESET}")
-
-print(f"{GREEN}✅ Telegram verification successful!{RESET}\n")
+BLUE = "\033[94m"
 
 User = "okhttp/4.12.0"
 headers = {"User-Agent": User}
+
 
 def login():
     base_url = "https://account.xiaomi.com"
@@ -118,7 +61,8 @@ def login():
     def parse(res):
         return json.loads(res.text[11:])
 
-    r = requests.get(f"{base_url}/pass/serviceLogin", params={'sid': sid, '_json': True}, headers=headers, cookies=cookies)
+    r = requests.get(f"{base_url}/pass/serviceLogin", params={'sid': sid, '_json': True}, headers=headers,
+                     cookies=cookies)
     cookies.update(r.cookies.get_dict())
 
     deviceId = cookies["deviceId"]
@@ -133,45 +77,63 @@ def login():
     if res["code"] == 70016: exit("invalid user or pwd")
     if 'notificationUrl' in res:
         url = res['notificationUrl']
-        if any(x in url for x in ['callback','SetEmail','BindAppealOrSafePhone']): exit(url)
+        if any(x in url for x in ['callback', 'SetEmail', 'BindAppealOrSafePhone']): exit(url)
 
         cookies.update({"NativeUserAgent": base64.b64encode(User.encode()).decode()})
         params = parse_qs(urlparse(url).query)
-        cookies.update(requests.get(f"{base_url}/identity/list", params=params, headers=headers, cookies=cookies).cookies.get_dict())
+        cookies.update(requests.get(f"{base_url}/identity/list", params=params, headers=headers,
+                                    cookies=cookies).cookies.get_dict())
 
-        email = parse(requests.get(f"{base_url}/identity/auth/verifyEmail", params={'_json': True}, cookies=cookies, headers=headers))['maskedEmail']
-        quota = parse(requests.post(f"{base_url}/identity/pass/sms/userQuota", data={'addressType': 'EM', 'contentType': 160040}, cookies=cookies, headers=headers))['info']
+        email = parse(requests.get(f"{base_url}/identity/auth/verifyEmail", params={'_json': True}, cookies=cookies,
+                                   headers=headers))['maskedEmail']
+        quota = parse(
+            requests.post(f"{base_url}/identity/pass/sms/userQuota", data={'addressType': 'EM', 'contentType': 160040},
+                          cookies=cookies, headers=headers))['info']
         print(f"Account Authentication\nemail: {email}, Remaining attempts: {quota}")
         input("\nPress Enter to send the verification code")
 
         code_res = parse(requests.post(f"{base_url}/identity/auth/sendEmailTicket", cookies=cookies, headers=headers))
 
-        if code_res["code"] == 0: print(f"\nVerification code sent to your {email}")
-        elif code_res["code"] == 70022: exit("Sent too many codes. Try again tomorrow.")
-        else: exit(code_res)
+        if code_res["code"] == 0:
+            print(f"\nVerification code sent to your {email}")
+        elif code_res["code"] == 70022:
+            exit("Sent too many codes. Try again tomorrow.")
+        else:
+            exit(code_res)
 
         while True:
             ticket = input("Enter code: ").strip()
-            v_res = parse(requests.post(f"{base_url}/identity/auth/verifyEmail", data={'ticket':ticket, 'trust':True}, cookies=cookies, headers=headers))
-            if v_res["code"] == 70014: print("Verification code error")
+            v_res = parse(requests.post(f"{base_url}/identity/auth/verifyEmail", data={'ticket': ticket, 'trust': True},
+                                        cookies=cookies, headers=headers))
+            if v_res["code"] == 70014:
+                print("Verification code error")
             elif v_res["code"] == 0:
-                cookies.update(requests.get(v_res['location'], headers=headers, cookies=cookies).history[1].cookies.get_dict())
+                cookies.update(
+                    requests.get(v_res['location'], headers=headers, cookies=cookies).history[1].cookies.get_dict())
                 cookies.pop("pass_ua", None)
                 break
-            else: exit(v_res)
+            else:
+                exit(v_res)
 
-        r = requests.get(f"{base_url}/pass/serviceLogin", params={'_json': "true", 'sid': sid}, cookies=cookies, headers=headers)
+        r = requests.get(f"{base_url}/pass/serviceLogin", params={'_json': "true", 'sid': sid}, cookies=cookies,
+                         headers=headers)
         res = parse(r)
 
-    region = json.loads(requests.get(f"https://account.xiaomi.com/pass/user/login/region", headers=headers, cookies=cookies).text[11:])["data"]["region"]    
+    region = json.loads(
+        requests.get(f"https://account.xiaomi.com/pass/user/login/region", headers=headers, cookies=cookies).text[11:])[
+        "data"]["region"]
 
     nonce, ssecurity = res['nonce'], res['ssecurity']
-    res['location'] += f"&clientSign={quote(base64.b64encode(hashlib.sha1(f'nonce={nonce}&{ssecurity}'.encode()).digest()))}"
+    res[
+        'location'] += f"&clientSign={quote(base64.b64encode(hashlib.sha1(f'nonce={nonce}&{ssecurity}'.encode()).digest()))}"
     serviceToken = requests.get(res['location'], headers=headers, cookies=cookies).cookies.get_dict()
 
-    micdata = {"userId": res['userId'], "new_bbs_serviceToken": serviceToken["new_bbs_serviceToken"], "region": region, "deviceId": deviceId}
-    with open("micdata.json", "w") as f: json.dump(micdata, f)
+    micdata = {"userId": res['userId'], "new_bbs_serviceToken": serviceToken["new_bbs_serviceToken"], "region": region,
+               "deviceId": deviceId}
+    with open("micdata.json", "w") as f:
+        json.dump(micdata, f)
     return micdata
+
 
 try:
     with open('micdata.json') as f:
@@ -179,13 +141,6 @@ try:
 
     if not all(micdata.get(k) for k in ("userId", "new_bbs_serviceToken", "region", "deviceId")):
         raise ValueError
-
-    # ===== COLORS =====
-    BLUE = "\033[94m"
-    YELLOW = "\033[93m"
-    WHITE = "\033[97m"
-    BOLD = "\033[1m"
-    RESET = "\033[0m"
 
     account_id = micdata['userId']
 
@@ -213,13 +168,6 @@ deviceId = micdata["deviceId"]
 
 region = micdata['region']
 
-# ===== COLORS =====
-BOX = "\033[95m"      # ← Yaha color change karo
-YELLOW = "\033[93m"
-WHITE = "\033[97m"
-BOLD = "\033[1m"
-RESET = "\033[0m"
-
 print(
     f"\n{BOX}{BOLD}╔══════════════════════════════════════╗{RESET}"
 )
@@ -243,21 +191,13 @@ U_apply = api + "apply/bl-auth"
 U_info = api + "user/data"
 
 headers = {
-  'User-Agent': User,
-  'Accept-Encoding': "gzip",
-  'Content-Type': "application/json",
-  'content-type': "application/json; charset=utf-8",
-  'Cookie': f"new_bbs_serviceToken={new_bbs_serviceToken};versionCode={versionCode};versionName={versionName};deviceId={deviceId};"
+    'User-Agent': User,
+    'Accept-Encoding': "gzip",
+    'Content-Type': "application/json",
+    'content-type': "application/json; charset=utf-8",
+    'Cookie': f"new_bbs_serviceToken={new_bbs_serviceToken};versionCode={versionCode};versionName={versionName};deviceId={deviceId};"
 }
 
-# ===== COLORS =====
-CYAN = "\033[96m"
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-RED = "\033[91m"
-WHITE = "\033[97m"
-BOLD = "\033[1m"
-RESET = "\033[0m"
 
 
 # ===== INFO BOX =====
@@ -308,6 +248,7 @@ def state_request():
 
 state_request()
 
+
 def apply_request():
     print("\n[APPLY]:")
     try:
@@ -347,17 +288,20 @@ def get_ntp_time(servers=["pool.ntp.org", "time.google.com", "time.windows.com"]
             continue
     return datetime.now(timezone.utc)
 
+
 def get_beijing_time():
     utc_time = get_ntp_time()
     return utc_time.astimezone(timezone(timedelta(hours=8)))
+
 
 def precise_sleep(target_time, precision=0.01):
     while True:
         diff = (target_time - datetime.now(target_time.tzinfo)).total_seconds()
         if diff <= 0:
             return
-        sleep_time = max(min(diff - precision/2, 1), precision)
+        sleep_time = max(min(diff - precision / 2, 1), precision)
         time.sleep(sleep_time)
+
 
 def measure_latency(url, samples=5):
     latencies = []
@@ -375,7 +319,8 @@ def measure_latency(url, samples=5):
     latencies.sort()
     trim = int(len(latencies) * 0.2)
     trimmed = latencies[trim:-trim] if trim else latencies
-    return sum(trimmed)/len(trimmed) * 1.3
+    return sum(trimmed) / len(trimmed) * 1.3
+
 
 def schedule_daily_task():
     beijing_tz = timezone(timedelta(hours=8))
